@@ -18,4 +18,9 @@ public class StatusController {
         System.out.println(authentication.getClass());
         return ResponseEntity.ok("Private route ok! User: " + authentication.getName());
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<String> privateRoute() {
+        return ResponseEntity.ok("Admin route ok!");
+    }
 }
