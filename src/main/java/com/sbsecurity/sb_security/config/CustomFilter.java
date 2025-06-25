@@ -1,5 +1,7 @@
 package com.sbsecurity.sb_security.config;
 
+import com.sbsecurity.sb_security.domain.security.CustomAuthentication;
+import com.sbsecurity.sb_security.domain.security.UserIdentification;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +26,14 @@ public class CustomFilter extends OncePerRequestFilter {
 
         if (secretHeader != null) {
             if (secretHeader.equals("secret")) {
-                Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        "Secret", null, List.of(new SimpleGrantedAuthority("USER")));
+                var userIdentification = new UserIdentification(
+                        "id-secret",
+                        "Secret",
+                        "x-secret",
+                        List.of("USER")
+                );
+
+                Authentication authentication = new CustomAuthentication(userIdentification);
 
                 SecurityContext securityContext = SecurityContextHolder.getContext();
                 securityContext.setAuthentication(authentication);

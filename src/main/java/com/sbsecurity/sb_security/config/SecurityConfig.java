@@ -3,8 +3,10 @@ package com.sbsecurity.sb_security.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,19 +19,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, MasterAuthenticationProvider masterAuthenticationProvider, CustomFilter customFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            MasterAuthenticationProvider masterAuthenticationProvider,
+            CustomAuthenticationProvider customAuthenticationProvider,
+            CustomFilter customFilter) throws Exception {
         return http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(customizer -> {
                     customizer.requestMatchers("/public").permitAll();
-                    customizer.requestMatchers("/admin").hasRole("ADMIN");
                     customizer.anyRequest().authenticated();
                 })
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
                 .authenticationProvider(masterAuthenticationProvider)
+                .authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -1,5 +1,7 @@
 package com.sbsecurity.sb_security.config;
 
+import com.sbsecurity.sb_security.domain.security.CustomAuthentication;
+import com.sbsecurity.sb_security.domain.security.UserIdentification;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,7 +23,13 @@ public class MasterAuthenticationProvider implements AuthenticationProvider {
         String passMaster = "@321";
 
         if (userMaster.equals(user) && passMaster.equals(pass)) {
-            return new UsernamePasswordAuthenticationToken("Master", null, List.of(new SimpleGrantedAuthority("ADMIN")));
+            UserIdentification userIdentification = new UserIdentification(
+                    "Master",
+                    "Master",
+                    userMaster,
+                    List.of("ADMIN"));
+
+            return new CustomAuthentication(userIdentification);
         }
 
         return null;
